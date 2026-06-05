@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedVault — Free Medical Education Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080c14;
+  --surface: #0f1624;
+  --surface2: #161f30;
+  --surface3: #1d2840;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8edf5;
+  --muted: #6b7a96;
+  --muted2: #4a5568;
+  --accent: #4f9cf9;
+  --accent-dim: rgba(79,156,249,0.12);
+  --accent-glow: rgba(79,156,249,0.25);
+  --green: #34d399;
+  --green-dim: rgba(52,211,153,0.12);
+  --red: #f87171;
+  --red-dim: rgba(248,113,113,0.12);
+  --gold: #fbbf24;
+  --gold-dim: rgba(251,191,36,0.12);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,0.12);
+  --pink: #f472b6;
+  --pink-dim: rgba(244,114,182,0.12);
+  --teal: #2dd4bf;
+  --teal-dim: rgba(45,212,191,0.12);
+  --orange: #fb923c;
+  --orange-dim: rgba(251,146,60,0.12);
+  --r: 12px;
+  --r-sm: 8px;
+  --syne: 'Syne', sans-serif;
+  --inter: 'Inter', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--inter);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ANIMATED BG */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 800px 600px at 20% 10%, rgba(79,156,249,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 400px at 80% 80%, rgba(167,139,250,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* LAYOUT */
+.app { display: flex; height: 100vh; position: relative; z-index: 1; }
+
+/* ═══════════════ SIDEBAR ═══════════════ */
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 0.5px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.logo-block {
+  padding: 20px 20px 16px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #4f9cf9, #7c3aed);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.logo-name {
+  font-family: var(--syne);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.logo-name span { color: var(--accent); }
+
+.logo-tagline {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+/* SCORE CHIPS */
+.score-chips {
+  display: flex;
+  gap: 6px;
+  padding: 12px 20px;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.chip {
+  flex: 1;
+  text-align: center;
+  padding: 6px 4px;
+  border-radius: var(--r-sm);
+  background: var(--surface2);
+  font-size: 11px;
+}
+
+.chip .cv { font-family: var(--syne); font-size: 16px; font-weight: 600; display: block; line-height: 1; margin-bottom: 2px; }
+.chip .cl { color: var(--muted); font-size: 10px; }
+.chip.c-correct .cv { color: var(--green); }
+.chip.c-wrong .cv { color: var(--red); }
+.chip.c-streak .cv { color: var(--gold); }
+
+/* SECTION LABELS */
+.sb-section { padding: 14px 20px 6px; }
+.sb-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+/* MODE BUTTONS */
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--inter);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+
+.mode-btn:hover { background: var(--surface2); color: var(--text); }
+.mode-btn.active { background: var(--accent-dim); color: var(--accent); }
+.mode-btn.active .mode-icon { background: var(--accent-glow); }
+
+.mode-icon {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.mode-badge {
+  margin-left: auto;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--gold-dim);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* EXAM MODE */
+.exam-selector {
+  padding: 8px 12px;
+  margin: 0 8px 4px;
+  border-radius: var(--r-sm);
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  color: var(--text);
+  font-family: var(--inter);
+  font-size: 12px;
+  cursor: pointer;
+  width: calc(100% - 16px);
+  outline: none;
+}
+
+.exam-selector option { background: var(--surface2); }
+
+/* SUBJECT PILLS */
+.subj-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 8px;
+}
+
+.subj-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--inter);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s;
+  width: 100%;
+}
+
+.subj-btn:hover { background: var(--surface2); color: var(--text); }
+.subj-btn.active { color: var(--text); font-weight: 500; }
+
+.subj-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sb-footer {
+  padding: 16px 20px;
+  border-top: 0.5px solid var(--border);
+  font-size: 11px;
+  color: var(--muted2);
+  margin-top: auto;
+}
+
+/* ═══════════════ MAIN ═══════════════ */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-height: 100vh;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.topbar-mode {
+  font-family: var(--syne);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.topbar-subject {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+.topbar-pill {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+/* CHAT AREA */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chat-area::-webkit-scrollbar { width: 4px; }
+.chat-area::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* WELCOME SCREEN */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  min-height: 400px;
+  animation: fadeUp 0.5s ease;
+}
+
+.welcome-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.welcome h2 {
+  font-family: var(--syne);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.welcome h2 span { color: var(--accent); }
+
+.welcome p {
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 480px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 620px;
+  width: 100%;
+}
+
+.quick-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  font-family: var(--inter);
+}
+
+.quick-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  transform: translateY(-2px);
+}
+
+.qc-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+.qc-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.qc-sub { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+/* MESSAGES */
+.msg { display: flex; gap: 12px; animation: fadeUp 0.3s ease; }
+.msg.user { flex-direction: row-reverse; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.msg.assistant .msg-avatar {
+  background: linear-gradient(135deg, #4f9cf9, #7c3aed);
+  font-family: var(--syne);
+  font-weight: 700;
+  font-size: 11px;
+  color: white;
+}
+
+.msg.user .msg-avatar { background: var(--surface3); color: var(--muted); font-size: 14px; }
+
+.msg-bubble {
+  max-width: 82%;
+  padding: 13px 16px;
+  border-radius: var(--r);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.msg.assistant .msg-bubble {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  color: var(--text);
+  border-radius: 4px var(--r) var(--r) var(--r);
+}
+
+.msg.user .msg-bubble {
+  background: var(--accent-dim);
+  border: 0.5px solid rgba(79,156,249,0.25);
+  color: var(--text);
+  border-radius: var(--r) 4px var(--r) var(--r);
+}
+
+/* Markdown inside bubbles */
+.msg-bubble h1 { font-family: var(--syne); font-size: 17px; font-weight: 600; margin: 14px 0 8px; color: var(--text); }
+.msg-bubble h2 { font-family: var(--syne); font-size: 15px; font-weight: 600; margin: 12px 0 6px; color: var(--accent); }
+.msg-bubble h3 { font-size: 14px; font-weight: 600; margin: 10px 0 5px; color: var(--teal); }
+.msg-bubble p { margin-bottom: 9px; }
+.msg-bubble p:last-child { margin-bottom: 0; }
+.msg-bubble ul, .msg-bubble ol { padding-left: 18px; margin-bottom: 9px; }
+.msg-bubble li { margin-bottom: 4px; }
+.msg-bubble strong { font-weight: 600; color: var(--text); }
+.msg-bubble em { font-style: italic; color: var(--gold); }
+.msg-bubble code { background: var(--surface3); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace; color: var(--teal); }
+.msg-bubble pre { background: var(--surface3); border-radius: var(--r-sm); padding: 12px; overflow-x: auto; margin: 10px 0; font-size: 12px; border: 0.5px solid var(--border2); }
+.msg-bubble table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+.msg-bubble th { background: var(--surface3); padding: 8px 10px; text-align: left; font-weight: 600; font-size: 12px; border: 0.5px solid var(--border2); color: var(--accent); }
+.msg-bubble td { padding: 7px 10px; border: 0.5px solid var(--border); vertical-align: top; }
+.msg-bubble tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.msg-bubble hr { border: none; border-top: 0.5px solid var(--border2); margin: 12px 0; }
+
+/* SVG diagram container */
+.diagram-wrap {
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 16px;
+  margin: 10px 0;
+  overflow-x: auto;
+}
+
+.diagram-wrap svg { max-width: 100%; height: auto; display: block; }
+
+/* MCQ CARD */
+.mcq-card {
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r);
+  padding: 18px;
+  margin: 6px 0;
+}
+
+.mcq-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mcq-type-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.diff-easy { background: var(--green-dim); color: var(--green); }
+.diff-medium { background: var(--gold-dim); color: var(--gold); }
+.diff-hard { background: var(--red-dim); color: var(--red); }
+
+.mcq-subject-tag {
+  font-size: 10px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.mcq-q {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+/* Clinical vignette style */
+.vignette-box {
+  background: var(--surface3);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.mcq-opts { display: flex; flex-direction: column; gap: 8px; }
+
+.mcq-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: var(--r-sm);
+  border: 0.5px solid var(--border2);
+  background: var(--surface3);
+  font-family: var(--inter);
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.5;
+  text-align: left;
+  width: 100%;
+}
+
+.mcq-opt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-dim); }
+.mcq-opt:disabled { cursor: default; }
+.mcq-opt.correct { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.mcq-opt.wrong { background: var(--red-dim); border-color: rgba(248,113,113,0.4); color: var(--red); }
+.opt-key { font-weight: 600; flex-shrink: 0; width: 18px; opacity: 0.7; }
+
+.mcq-feedback {
+  margin-top: 14px;
+  padding: 13px 16px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  line-height: 1.75;
+  display: none;
+}
+
+.mcq-feedback.show { display: block; animation: fadeUp 0.2s ease; }
+.mcq-feedback.correct { background: var(--green-dim); border: 0.5px solid rgba(52,211,153,0.3); color: #6ee7b7; }
+.mcq-feedback.wrong { background: var(--red-dim); border: 0.5px solid rgba(248,113,113,0.3); color: #fca5a5; }
+.mcq-feedback strong { display: block; margin-bottom: 5px; font-size: 14px; }
+
+/* ACTION ROW */
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.action-btn {
+  font-family: var(--inter);
+  font-size: 12px;
+  padding: 8px 14px;
+  border-radius: var(--r-sm);
+  border: 0.5px solid var(--border2);
+  background: var(--surface3);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.action-btn:hover { border-color: rgba(255,255,255,0.2); background: var(--surface2); }
+.action-btn.primary { background: var(--accent-dim); border-color: rgba(79,156,249,0.3); color: var(--accent); }
+.action-btn.primary:hover { background: rgba(79,156,249,0.2); }
+
+/* TYPING INDICATOR */
+.typing-indicator { display: flex; gap: 12px; align-items: flex-start; }
+
+.typing-dots {
+  display: flex;
+  gap: 5px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 4px var(--r) var(--r) var(--r);
+  align-items: center;
+}
+
+.typing-dots span {
+  width: 5px; height: 5px;
+  background: var(--muted);
+  border-radius: 50%;
+  animation: bounce 1.2s ease infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* ERROR */
+.error-msg {
+  background: var(--red-dim);
+  border: 0.5px solid rgba(248,113,113,0.3);
+  border-radius: var(--r-sm);
+  color: var(--red);
+  padding: 12px 16px;
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+/* ═══════════════ INPUT BAR ═══════════════ */
+.input-section {
+  background: var(--surface);
+  border-top: 0.5px solid var(--border);
+  padding: 14px 24px 16px;
+  flex-shrink: 0;
+}
+
+.mode-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mode-pill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border2);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--inter);
+  transition: all 0.12s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mode-pill:hover { background: var(--surface2); color: var(--text); }
+.mode-pill.active { border-color: rgba(79,156,249,0.4); background: var(--accent-dim); color: var(--accent); }
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.msg-input {
+  flex: 1;
+  font-family: var(--inter);
+  font-size: 14px;
+  padding: 11px 16px;
+  background: var(--surface2);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  outline: none;
+  resize: none;
+  min-height: 44px;
+  max-height: 130px;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+}
+
+.msg-input::placeholder { color: var(--muted2); }
+.msg-input:focus { border-color: rgba(79,156,249,0.4); }
+
+.send-btn {
+  width: 44px; height: 44px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: linear-gradient(135deg, #4f9cf9, #7c3aed);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.send-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.send-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+/* SUBJECT COLORS */
+.c-anat { color: #f87171; } .d-anat { background: #6366f1; }
+.c-phys { color: #34d399; } .d-phys { background: #10b981; }
+.c-bio  { color: #fbbf24; } .d-bio  { background: #f59e0b; }
+.c-path { color: #f472b6; } .d-path { background: #ec4899; }
+.c-micro{ color: #a78bfa; } .d-micro{ background: #8b5cf6; }
+.c-pharm{ color: #4f9cf9; } .d-pharm{ background: #3b82f6; }
+.c-comm { color: #2dd4bf; } .d-comm { background: #14b8a6; }
+.c-med  { color: #fb923c; } .d-med  { background: #f97316; }
+.c-surg { color: #94a3b8; } .d-surg { background: #64748b; }
+.c-obg  { color: #f9a8d4; } .d-obg  { background: #ec4899; }
+.c-paed { color: #86efac; } .d-paed { background: #22c55e; }
+.c-psych{ color: #c4b5fd; } .d-psych{ background: #7c3aed; }
+.c-ent  { color: #fdba74; } .d-ent  { background: #ea580c; }
+.c-eye  { color: #7dd3fc; } .d-eye  { background: #0284c7; }
+.c-derm { color: #fde68a; } .d-derm { background: #d97706; }
+.c-rad  { color: #6ee7b7; } .d-rad  { background: #059669; }
+.c-ortho{ color: #fca5a5; } .d-ortho{ background: #dc2626; }
+.c-foren{ color: #d1d5db; } .d-foren{ background: #6b7280; }
+.c-emerg{ color: #fb7185; } .d-emerg{ background: #f43f5e; }
+
+/* MOBILE */
+.mob-btn {
+  display: none;
+  position: fixed;
+  top: 12px; left: 12px;
+  z-index: 100;
+  width: 36px; height: 36px;
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  align-items: center; justify-content: center;
+  color: var(--text);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -290px;
+    top: 0; bottom: 0;
+    z-index: 50;
+    transition: left 0.25s ease;
+  }
+  .sidebar.open { left: 0; }
+  .mob-btn { display: flex; }
+  .main { max-width: 100%; }
+  .chat-area { padding: 60px 16px 16px; }
+  .input-section { padding: 10px 16px 12px; }
+  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+  .welcome h2 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<button class="mob-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<div class="app">
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo-block">
+    <div class="logo">
+      <div class="logo-icon">⚕️</div>
+      <div class="logo-name">Med<span>Vault</span></div>
+    </div>
+    <div class="logo-tagline">Free Medical Education Platform</div>
+  </div>
+
+  <div class="score-chips" id="score-chips" style="display:none">
+    <div class="chip"><span class="cv" id="sc-total">0</span><span class="cl">Questions</span></div>
+    <div class="chip c-correct"><span class="cv" id="sc-right">0</span><span class="cl">Correct</span></div>
+    <div class="chip c-wrong"><span class="cv" id="sc-wrong">0</span><span class="cl">Wrong</span></div>
+    <div class="chip c-streak"><span class="cv" id="sc-streak">0</span><span class="cl">Streak 🔥</span></div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Mode</div>
+    <button class="mode-btn active" id="sb-chat" onclick="setMode('chat')">
+      <span class="mode-icon">💬</span> Ask anything
+    </button>
+    <button class="mode-btn" id="sb-mcq" onclick="setMode('mcq')">
+      <span class="mode-icon">🎯</span> MCQ Practice
+      <span class="mode-badge">NEET PG</span>
+    </button>
+    <button class="mode-btn" id="sb-case" onclick="setMode('case')">
+      <span class="mode-icon">🏥</span> Clinical Cases
+    </button>
+    <button class="mode-btn" id="sb-drug" onclick="setMode('drug')">
+      <span class="mode-icon">💊</span> Drug Cards
+    </button>
+    <button class="mode-btn" id="sb-diagram" onclick="setMode('diagram')">
+      <span class="mode-icon">🫀</span> Diagrams
+    </button>
+    <button class="mode-btn" id="sb-simplify" onclick="setMode('simplify')">
+      <span class="mode-icon">✨</span> Simplify
+    </button>
+    <button class="mode-btn" id="sb-compare" onclick="setMode('compare')">
+      <span class="mode-icon">⚖️</span> Compare
+    </button>
+    <button class="mode-btn" id="sb-mnemonic" onclick="setMode('mnemonic')">
+      <span class="mode-icon">🧠</span> Mnemonics
+    </button>
+    <button class="mode-btn" id="sb-revise" onclick="setMode('revise')">
+      <span class="mode-icon">⚡</span> Quick Revision
+    </button>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Exam Target</div>
+    <select class="exam-selector" id="exam-select" onchange="setExam(this.value)">
+      <option value="mbbs">MBBS (Term / Professional)</option>
+      <option value="neetpg">NEET PG</option>
+      <option value="usmle1">USMLE Step 1</option>
+      <option value="usmle2">USMLE Step 2 CK</option>
+      <option value="fcps">FCPS / MRCP</option>
+      <option value="intern">Internship / Clinical</option>
+    </select>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Subject</div>
+    <div class="subj-grid" id="subj-grid">
+      <button class="subj-btn active" onclick="setSubject(this,'Anatomy')"><span class="subj-dot d-anat"></span> Anatomy</button>
+      <button class="subj-btn" onclick="setSubject(this,'Physiology')"><span class="subj-dot d-phys"></span> Physiology</button>
+      <button class="subj-btn" onclick="setSubject(this,'Biochemistry')"><span class="subj-dot d-bio"></span> Biochemistry</button>
+      <button class="subj-btn" onclick="setSubject(this,'Pathology')"><span class="subj-dot d-path"></span> Pathology</button>
+      <button class="subj-btn" onclick="setSubject(this,'Microbiology')"><span class="subj-dot d-micro"></span> Microbiology</button>
+      <button class="subj-btn" onclick="setSubject(this,'Pharmacology')"><span class="subj-dot d-pharm"></span> Pharmacology</button>
+      <button class="subj-btn" onclick="setSubject(this,'Community Medicine')"><span class="subj-dot d-comm"></span> Community Med</button>
+      <button class="subj-btn" onclick="setSubject(this,'Forensic Medicine')"><span class="subj-dot d-foren"></span> Forensic Med</button>
+      <button class="subj-btn" onclick="setSubject(this,'Medicine')"><span class="subj-dot d-med"></span> Medicine</button>
+      <button class="subj-btn" onclick="setSubject(this,'Surgery')"><span class="subj-dot d-surg"></span> Surgery</button>
+      <button class="subj-btn" onclick="setSubject(this,'OBG')"><span class="subj-dot d-obg"></span> OBG</button>
+      <button class="subj-btn" onclick="setSubject(this,'Paediatrics')"><span class="subj-dot d-paed"></span> Paediatrics</button>
+      <button class="subj-btn" onclick="setSubject(this,'Psychiatry')"><span class="subj-dot d-psych"></span> Psychiatry</button>
+      <button class="subj-btn" onclick="setSubject(this,'ENT')"><span class="subj-dot d-ent"></span> ENT</button>
+      <button class="subj-btn" onclick="setSubject(this,'Ophthalmology')"><span class="subj-dot d-eye"></span> Ophthalmology</button>
+      <button class="subj-btn" onclick="setSubject(this,'Dermatology')"><span class="subj-dot d-derm"></span> Dermatology</button>
+      <button class="subj-btn" onclick="setSubject(this,'Radiology')"><span class="subj-dot d-rad"></span> Radiology</button>
+      <button class="subj-btn" onclick="setSubject(this,'Orthopaedics')"><span class="subj-dot d-ortho"></span> Orthopaedics</button>
+      <button class="subj-btn" onclick="setSubject(this,'Emergency Medicine')"><span class="subj-dot d-emerg"></span> Emergency Med</button>
+    </div>
+  </div>
+
+  <div class="sb-footer">
+    Free forever · No signup · No ads<br>
+    Made for medical students worldwide 🌍
+  </div>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <span class="topbar-mode" id="topbar-mode">Ask anything</span>
+      <span class="topbar-subject" id="topbar-subj">· Anatomy</span>
+    </div>
+    <span class="topbar-pill" id="topbar-exam" style="background:var(--accent-dim);color:var(--accent)">MBBS</span>
+  </div>
+
+  <div class="chat-area" id="chat-area">
+    <div class="welcome" id="welcome">
+      <div class="welcome-badge">Free · Unlimited · AI-Powered</div>
+      <h2>Your complete<br><span>medical education</span> companion</h2>
+      <p>From 1st year MBBS to NEET PG to USMLE — ask anything, practice MCQs, solve clinical cases, understand drugs, and master every concept. Free forever.</p>
+      <div class="quick-grid">
+        <button class="quick-card" onclick="sendQ('Explain the mechanism of action of beta blockers with clinical significance')">
+          <span class="qc-icon">💊</span>
+          <div class="qc-title">Drug mechanism</div>
+          <div class="qc-sub">Deep pharmacology explanations</div>
+        </button>
+        <button class="quick-card" onclick="setModeAndSend('case','Give me a clinical case on chest pain for diagnosis')">
+          <span class="qc-icon">🏥</span>
+          <div class="qc-title">Clinical case</div>
+          <div class="qc-sub">Diagnose & manage real-world scenarios</div>
+        </button>
+        <button class="quick-card" onclick="setModeAndSend('mcq','Give me a hard NEET PG style MCQ')">
+          <span class="qc-icon">🎯</span>
+          <div class="qc-title">NEET PG MCQ</div>
+          <div class="qc-sub">Clinical vignette style questions</div>
+        </button>
+        <button class="quick-card" onclick="sendQ('Simplify the coagulation cascade with a mnemonic')">
+          <span class="qc-icon">✨</span>
+          <div class="qc-title">Simplify a topic</div>
+          <div class="qc-sub">Hard concepts made easy</div>
+        </button>
+        <button class="quick-card" onclick="sendQ('Differentiate Type 1 vs Type 2 diabetes mellitus in a comparison table')">
+          <span class="qc-icon">⚖️</span>
+          <div class="qc-title">Compare topics</div>
+          <div class="qc-sub">Side-by-side comparison tables</div>
+        </button>
+        <button class="quick-card" onclick="setModeAndSend('revise','High yield revision points for NEET PG Pharmacology')">
+          <span class="qc-icon">⚡</span>
+          <div class="qc-title">Quick revision</div>
+          <div class="qc-sub">High-yield points before exams</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="mode-pills">
+      <button class="mode-pill active" id="pill-chat" onclick="setMode('chat')">💬 Ask</button>
+      <button class="mode-pill" id="pill-mcq" onclick="setMode('mcq')">🎯 MCQ</button>
+      <button class="mode-pill" id="pill-case" onclick="setMode('case')">🏥 Case</button>
+      <button class="mode-pill" id="pill-drug" onclick="setMode('drug')">💊 Drug</button>
+      <button class="mode-pill" id="pill-diagram" onclick="setMode('diagram')">🫀 Diagram</button>
+      <button class="mode-pill" id="pill-simplify" onclick="setMode('simplify')">✨ Simplify</button>
+      <button class="mode-pill" id="pill-compare" onclick="setMode('compare')">⚖️ Compare</button>
+      <button class="mode-pill" id="pill-mnemonic" onclick="setMode('mnemonic')">🧠 Mnemonic</button>
+      <button class="mode-pill" id="pill-revise" onclick="setMode('revise')">⚡ Revise</button>
+    </div>
+    <div class="input-row">
+      <textarea class="msg-input" id="msg-input" rows="1"
+        placeholder="Ask anything about medicine..."
+        onkeydown="handleKey(event)"
+        oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const API_KEY = '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';
+const MODEL = 'llama-3.1-8b-instant';
+
+const state = {
+  mode: 'chat', subject: 'Anatomy', exam: 'mbbs',
+  messages: [], loading: false,
+  score: { total:0, correct:0, wrong:0, streak:0 }
+};
+
+const EXAM_LABELS = { mbbs:'MBBS', neetpg:'NEET PG', usmle1:'USMLE Step 1', usmle2:'USMLE Step 2', fcps:'FCPS', intern:'Clinical' };
+const MODE_NAMES = { chat:'Ask anything', mcq:'MCQ Practice', case:'Clinical Cases', drug:'Drug Cards', diagram:'Diagrams', simplify:'Simplify', compare:'Compare', mnemonic:'Mnemonics', revise:'Quick Revision' };
+const PLACEHOLDERS = {
+  chat: 'Ask anything about medicine...', mcq: 'Type a topic for MCQ, or just press send...',
+  case: 'Describe a case topic, or press send for a random case...',
+  drug: 'Enter a drug name for a complete drug card...',
+  diagram: 'What do you want diagrammed?', simplify: 'Which topic should I simplify?',
+  compare: 'What do you want to compare?', mnemonic: 'What mnemonic do you need?',
+  revise: 'Which topic for high-yield revision?'
+};
+
+const SYSTEM_PROMPTS = {
+  chat: (s,e) => `You are MedVault AI — a world-class medical educator. You explain like a brilliant senior doctor talking to a student.
+Subject: ${s} | Exam level: ${e}
+- Use markdown: **bold** key terms, ## section headers, bullet points, numbered steps
+- Give clinical relevance, not just theory
+- Include mnemonics when helpful
+- For ${e === 'neetpg' ? 'NEET PG' : e === 'usmle1' ? 'USMLE Step 1' : 'MBBS'} level depth
+- Be thorough but structured. End with a "Clinical Pearl" or "High-Yield Tip" when relevant`,
+
+  mcq: (s,e) => `You are MedVault MCQ engine. Generate ONE high-quality MCQ for ${e === 'neetpg' ? 'NEET PG' : e === 'usmle1' ? 'USMLE Step 1/2' : 'MBBS'} exam.
+Subject: ${s}
+For NEET PG/USMLE: Use clinical vignette format (patient scenario with age, symptoms, investigations, then question).
+For MBBS: Direct conceptual or applied question.
+Respond ONLY with valid JSON (no backticks, no extra text):
+{"question":"...","vignette":"clinical scenario if applicable, else empty string","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"A","explanation":"Detailed explanation: why correct answer is right AND why each wrong option is wrong. Include the mechanism, clinical relevance, and a memory tip.","difficulty":"easy|medium|hard","type":"direct|vignette"}`,
+
+  case: (s,e) => `You are MedVault Clinical Case Presenter. Present a realistic clinical case.
+Subject: ${s} | Level: ${e}
+Format:
+## 🏥 Clinical Case
+
+**Patient:** [demographics]
+**Presenting complaint:** [chief complaint]
+**History:** [detailed HPI]
+**Examination:** [relevant findings]
+**Investigations:** [key results with values]
+
+---
+**What is the most likely diagnosis?**
+*(Answer and discuss below)*
+
+---
+## Diagnosis & Discussion
+[Full diagnosis, differentials, pathophysiology, management protocol, complications, prognosis]
+
+Make it realistic, educational, and clinically rich.`,
+
+  drug: (s,e) => `You are MedVault Drug Reference. Give a complete drug card.
+Format your response with these sections using markdown:
+## 💊 [Drug Name]
+**Drug Class:** | **Prototype:** 
+
+### Mechanism of Action
+[Detailed MOA with receptor/channel/enzyme involved]
+
+### Pharmacokinetics
+[ADME — absorption, distribution, metabolism, excretion, half-life]
+
+### Clinical Uses
+[Indications with clinical context]
+
+### Adverse Effects
+[List by system, highlight important/unique ones]
+
+### Contraindications & Precautions
+
+### Drug Interactions
+[Major interactions with mechanism]
+
+### Dosage & Route
+
+### 🧠 Memory Tip / Mnemonic
+
+### ⚡ High-Yield Points for ${e === 'neetpg' ? 'NEET PG' : 'Exam'}`,
+
+  diagram: (s,e) => `You are MedVault Diagram Engine.
+Create a clear educational flowchart/pathway diagram using SVG.
+STRICT RULES:
+- viewBox="0 0 480 520" — NEVER change width from 480
+- ONLY <rect>, <line>, <text>, <polygon> — no circles or freehand shapes
+- Arrow marker in defs: <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#4f9cf9"/></marker></defs>
+- Boxes: <rect rx="8" fill="#161f30" stroke="#4f9cf9" stroke-width="1.5"/>
+- Arrow lines: <line stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#arr)"/>
+- Text: font-family="Inter,sans-serif" font-size="13" fill="#e8edf5" text-anchor="middle"
+- Layout: ONE column, centered at x=240, each box width=260 x=110, height=44, spaced 70px apart
+- Max 2 boxes side-by-side (width=170 each, at x=30 and x=280)
+- Start SVG directly, no code blocks or backticks
+- After </svg> write 2 lines of explanation`,
+
+  simplify: (s,e) => `You are MedVault Simplifier. Make complex topics crystal clear.
+For the topic asked:
+## ⚡ Simple Version First
+[Explain in 2 sentences like explaining to a non-medical person]
+
+## 🔬 The Medical Explanation  
+[Proper medical explanation, structured]
+
+## 🎯 The Key Points (Exam Focus)
+[Bullet points of what to remember]
+
+## 🧠 Mnemonic / Memory Aid
+[A memorable trick if applicable]
+
+## 💡 Clinical Relevance
+[Why this matters clinically]
+
+## ⭐ High-Yield for ${e === 'neetpg' ? 'NEET PG' : 'Exam'}
+[The one-liner that examiners love]`,
+
+  compare: (s,e) => `You are MedVault Comparison Engine.
+## ⚖️ Comparison
+
+Create a detailed markdown comparison table with | columns |.
+Then add:
+## 🔑 Key Differentiating Features
+[The must-know differences]
+
+## 🧠 Memory Tips
+[How to remember which is which]
+
+## ⚠️ Common Exam Traps
+[Mistakes students make]`,
+
+  mnemonic: (s,e) => `You are MedVault Mnemonic Generator.
+Create memorable, clever mnemonics for the topic asked.
+## 🧠 Mnemonic(s)
+
+[Give 1-3 mnemonics — acronym, story, visual, whatever works best]
+
+## 📝 What Each Letter/Part Stands For
+[Full breakdown]
+
+## 🔄 How to Use It
+[Practice tip, context]
+
+## ⚡ Related High-Yield Points
+[Quick facts to remember alongside the mnemonic]`,
+
+  revise: (s,e) => `You are MedVault Rapid Revision Engine. Give high-yield revision notes.
+## ⚡ High-Yield Revision: [Topic]
+*For ${e === 'neetpg' ? 'NEET PG' : e === 'usmle1' ? 'USMLE Step 1' : 'MBBS'} preparation*
+
+### 🎯 Must-Know Facts
+[Numbered list of top 10-15 high-yield facts]
+
+### 📊 Important Numbers & Values
+[Key values, doses, timings, statistics]
+
+### 🔬 Classic Presentations / Buzzwords
+[Pathognomonic signs, classic findings]
+
+### 💊 Key Drugs (if applicable)
+[Drug → Use associations]
+
+### ⚠️ Common Exam Traps
+[Frequently tested confusing points]
+
+### 🧠 Master Mnemonic
+[One mnemonic that captures the most]`
+};
+
+// ═══ STATE FUNCTIONS ═══
+function setMode(mode) {
+  state.mode = mode;
+  state.messages = [];
+  ['chat','mcq','case','drug','diagram','simplify','compare','mnemonic','revise'].forEach(m => {
+    document.getElementById('sb-'+m)?.classList.toggle('active', m===mode);
+    document.getElementById('pill-'+m)?.classList.toggle('active', m===mode);
+  });
+  document.getElementById('topbar-mode').textContent = MODE_NAMES[mode];
+  document.getElementById('msg-input').placeholder = PLACEHOLDERS[mode];
+  document.getElementById('score-chips').style.display = mode === 'mcq' ? 'flex' : 'none';
+  if (mode === 'mcq' || mode === 'case') sendMessage('');
+}
+
+function setModeAndSend(mode, text) {
+  setMode(mode);
+  hideWelcome();
+  document.getElementById('msg-input').value = text;
+  sendMessage();
+}
+
+function setSubject(btn, subject) {
+  state.subject = subject;
+  state.messages = [];
+  document.querySelectorAll('.subj-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('topbar-subj').textContent = '· ' + subject;
+  if (window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
+}
+
+function setExam(val) {
+  state.exam = val;
+  state.messages = [];
+  document.getElementById('topbar-exam').textContent = EXAM_LABELS[val];
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function sendQ(text) {
+  hideWelcome();
+  document.getElementById('msg-input').value = text;
+  sendMessage();
+}
+
+function hideWelcome() {
+  const w = document.getElementById('welcome');
+  if (w) w.style.display = 'none';
+}
+
+function addMsg(role, html) {
+  hideWelcome();
+  const area = document.getElementById('chat-area');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const av = document.createElement('div');
+  av.className = 'msg-avatar';
+  av.textContent = role === 'assistant' ? 'MV' : '👤';
+  const bub = document.createElement('div');
+  bub.className = 'msg-bubble';
+  bub.innerHTML = html;
+  div.appendChild(av);
+  div.appendChild(bub);
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return bub;
+}
+
+function showTyping() {
+  const area = document.getElementById('chat-area');
+  const div = document.createElement('div');
+  div.className = 'typing-indicator';
+  div.id = 'typing';
+  div.innerHTML = `<div class="msg-avatar" style="background:linear-gradient(135deg,#4f9cf9,#7c3aed);color:white;font-family:var(--syne);font-weight:700;font-size:11px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center">MV</div>
+    <div class="typing-dots"><span></span><span></span><span></span></div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+function removeTyping() { document.getElementById('typing')?.remove(); }
+
+// ═══ MARKDOWN RENDERER ═══
+function md(text) {
+  if (!text) return '';
+  const svgs = [];
+  text = text.replace(/<svg[\s\S]*?<\/svg>/gi, m => { svgs.push(m); return `___SVG${svgs.length-1}___`; });
+
+  let h = text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/```[\s\S]*?```/g, m => {
+      const code = m.replace(/```\w*\n?/g,'').replace(/```/g,'');
+      return '<pre><code>' + code + '</code></pre>';
+    })
+    .replace(/^---$/gm,'<hr>')
+    .replace(/^\| (.+) \|$/gm, m => m)
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>\n?)+/g, m => '<ul>' + m + '</ul>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>');
+
+  // tables
+  h = h.replace(/(\|.+\|\n?)+/g, tbl => {
+    const rows = tbl.trim().split('\n');
+    let out = '<table>';
+    rows.forEach((row,i) => {
+      if (/^\|[-| :]+\|$/.test(row)) return;
+      const cells = row.split('|').filter(c => c.trim() !== '');
+      const tag = i === 0 ? 'th' : 'td';
+      out += '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+    });
+    return out + '</table>';
+  });
+
+  if (!h.startsWith('<h') && !h.startsWith('<ul') && !h.startsWith('<p') && !h.startsWith('<pre')) {
+    h = '<p>' + h + '</p>';
+  }
+
+  svgs.forEach((svg, i) => {
+    const fixed = svg.replace(/<svg /g, '<svg width="100%" style="max-width:100%;display:block" ');
+    h = h.replace(`___SVG${i}___`, `</p><div class="diagram-wrap">${fixed}</div><p>`);
+  });
+
+  return h.replace(/<p><\/p>/g,'').replace(/<\/p><\/p>/g,'</p>');
+}
+
+// ═══ MCQ RENDERER ═══
+let currentMCQ = null;
+let mcqCardId = 0;
+
+function renderMCQ(q) {
+  currentMCQ = q;
+  mcqCardId++;
+  const cid = mcqCardId;
+  const diffClass = {easy:'diff-easy',medium:'diff-medium',hard:'diff-hard'}[q.difficulty]||'diff-medium';
+
+  const opts = ['A','B','C','D'].map(k =>
+    `<button class="mcq-opt" data-key="${k}" data-cardid="${cid}">
+      <span class="opt-key">${k}.</span><span>${q.options[k]}</span>
+    </button>`
+  ).join('');
+
+  const vignette = q.vignette ? `<div class="vignette-box">📋 ${q.vignette}</div>` : '';
+
+  return `<div class="mcq-card" id="mcq-card-${cid}">
+    <div class="mcq-header">
+      <span class="mcq-type-badge ${diffClass}">${q.difficulty||'medium'}</span>
+      ${q.type==='vignette'?'<span class="mcq-type-badge" style="background:var(--purple-dim);color:var(--purple)">Clinical</span>':''}
+      <span class="mcq-subject-tag">${state.subject} · ${EXAM_LABELS[state.exam]}</span>
+    </div>
+    ${vignette}
+    <div class="mcq-q">${q.question}</div>
+    <div class="mcq-opts" id="mcq-opts-${cid}">${opts}</div>
+    <div class="mcq-feedback" id="mcq-fb-${cid}"></div>
+    <button class="action-btn primary" id="mcq-next-${cid}" style="display:none;margin-top:12px">Next question →</button>
+  </div>`;
+}
+
+// Global click handler for all MCQ interactions — fixes the delegation bug
+document.addEventListener('click', function(e) {
+  // Option button clicked
+  const optBtn = e.target.closest('.mcq-opt');
+  if (optBtn && !optBtn.disabled) {
+    const cid = optBtn.dataset.cardid;
+    const card = document.getElementById('mcq-card-' + cid);
+    if (!card) return;
+    const chosen = optBtn.dataset.key;
+    const q = currentMCQ;
+    if (!q) return;
+
+    // Disable all options in this card
+    card.querySelectorAll('.mcq-opt').forEach(b => b.disabled = true);
+    const isRight = chosen === q.correct;
+    optBtn.classList.add(isRight ? 'correct' : 'wrong');
+    const correctBtn = card.querySelector(`.mcq-opt[data-key="${q.correct}"]`);
+    if (!isRight && correctBtn) correctBtn.classList.add('correct');
+
+    if (isRight) { state.score.correct++; state.score.streak++; }
+    else { state.score.wrong++; state.score.streak = 0; }
+    state.score.total++;
+    updateScore();
+
+    const fb = document.getElementById('mcq-fb-' + cid);
+    if (fb) {
+      fb.className = 'mcq-feedback show ' + (isRight ? 'correct' : 'wrong');
+      fb.innerHTML = `<strong>${isRight ? '✓ Correct!' : '✗ The answer is ' + q.correct + '.'}</strong>${md(q.explanation)}`;
+    }
+    const nb = document.getElementById('mcq-next-' + cid);
+    if (nb) nb.style.display = 'inline-block';
+    return;
+  }
+
+  // Next question button clicked
+  const nextBtn = e.target.closest('[id^="mcq-next-"]');
+  if (nextBtn) {
+    nextMCQ();
+    return;
+  }
+});
+
+function updateScore() {
+  document.getElementById('sc-total').textContent = state.score.total;
+  document.getElementById('sc-right').textContent = state.score.correct;
+  document.getElementById('sc-wrong').textContent = state.score.wrong;
+  document.getElementById('sc-streak').textContent = state.score.streak;
+}
+
+function nextMCQ() { sendMessage(''); }
+
+// ═══ MAIN SEND ═══
+async function sendMessage(overrideText) {
+  if (state.loading) return;
+  const input = document.getElementById('msg-input');
+  const text = overrideText !== undefined ? overrideText : input.value.trim();
+
+  if (text === '' && state.mode !== 'mcq' && state.mode !== 'case') return;
+
+  if (text && overrideText === undefined) {
+    input.value = '';
+    input.style.height = 'auto';
+    addMsg('user', md(text));
+  }
+
+  const userContent = buildContent(text);
+  state.messages.push({ role: 'user', content: userContent });
+  if (state.messages.length > 18) state.messages = state.messages.slice(-14);
+
+  state.loading = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + API_KEY
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPTS[state.mode](state.subject, state.exam) },
+          ...state.messages
+        ],
+        max_tokens: 1200,
+        temperature: 0.7
+      })
+    });
+
+    if (!res.ok) {
+      const e = await res.json().catch(()=>({}));
+      throw new Error(e.error?.message || 'API error ' + res.status);
+    }
+
+    const data = await res.json();
+    const raw = data.choices?.[0]?.message?.content || '';
+    state.messages.push({ role: 'assistant', content: raw });
+    removeTyping();
+
+    if (state.mode === 'mcq') {
+      try {
+        const clean = raw.replace(/```json|```/g,'').trim();
+        const q = JSON.parse(clean);
+        addMsg('assistant', renderMCQ(q));
+      } catch { addMsg('assistant', md(raw)); }
+    } else {
+      addMsg('assistant', md(raw));
+    }
+
+  } catch(e) {
+    removeTyping();
+    const area = document.getElementById('chat-area');
+    const err = document.createElement('div');
+    err.className = 'error-msg';
+    err.textContent = e.message.includes('Rate limit')
+      ? '⏳ Rate limit hit — wait 10 seconds and try again. (Free tier limit)'
+      : '⚠️ ' + e.message;
+    area.appendChild(err);
+    area.scrollTop = area.scrollHeight;
+    state.messages.pop();
+  }
+
+  state.loading = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+function buildContent(text) {
+  const t = text || '';
+  if (state.mode === 'mcq' && !t) return `Give me a ${state.exam === 'neetpg' ? 'NEET PG style clinical vignette' : 'MBBS'} MCQ on ${state.subject}`;
+  if (state.mode === 'mcq') return `Give me an MCQ about: ${t} (subject: ${state.subject})`;
+  if (state.mode === 'case' && !t) return `Present a clinical case on ${state.subject}`;
+  if (state.mode === 'drug') return `Give me a complete drug card for: ${t || 'a commonly tested drug in ' + state.subject}`;
+  if (state.mode === 'diagram') return `Draw a diagram of: ${t || 'an important pathway in ' + state.subject}`;
+  if (state.mode === 'simplify') return `Simplify this topic: ${t || state.subject + ' - explain a key concept'}`;
+  if (state.mode === 'mnemonic') return `Create a mnemonic for: ${t || 'an important topic in ' + state.subject}`;
+  if (state.mode === 'revise') return `Give high-yield revision notes on: ${t || state.subject}`;
+  return t;
+}
+
+// click outside sidebar on mobile
+document.addEventListener('click', e => {
+  const sb = document.getElementById('sidebar');
+  if (window.innerWidth < 768 && sb.classList.contains('open')) {
+    if (!sb.contains(e.target) && !document.querySelector('.mob-btn').contains(e.target)) {
+      sb.classList.remove('open');
+    }
+  }
+});
+</script>
+</body>
+</html>
